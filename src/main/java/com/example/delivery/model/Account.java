@@ -21,6 +21,14 @@ public class Account {
     @Column(nullable = false, updatable = false)
     private Date createdOn;
 
+    public Account(Integer accountId, String email, Date birthdate, String lastPaymentDate, Date createdOn) {
+        this.accountId = accountId;
+        this.email = email;
+        this.birthdate = birthdate;
+        this.lastPaymentDate = lastPaymentDate;
+        this.createdOn = createdOn;
+    }
+
 
     public Integer getAccountId() {
         return accountId;
