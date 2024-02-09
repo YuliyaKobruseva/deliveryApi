@@ -7,7 +7,6 @@ import com.example.delivery.enums.PaymentType;
 import com.example.delivery.feign.LogsClient;
 import com.example.delivery.feign.PaymentValidationClient;
 import com.example.delivery.model.Payment;
-import com.example.delivery.repository.AccountRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,7 @@ public class PaymentsListener {
     private PaymentService paymentService;
 
     @Autowired
-    AccountRepository accountRepository;
+    AccountService accountService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -59,7 +58,7 @@ public class PaymentsListener {
     public void listenOfflinePayments(String message) {
         try {
             PaymentRequest paymentRequest = objectMapper.readValue(message, PaymentRequest.class);
-
+            paymentService.processPayment(convertToPayment(paymentRequest));
         } catch (Exception e) {
             saveLogError(e.getMessage());
         }
@@ -67,7 +66,7 @@ public class PaymentsListener {
 
     private Payment convertToPayment(PaymentRequest paymentRequest) {
         return new Payment(paymentRequest.getPaymentId(),
-                accountRepository.getAccountByAccountId(paymentRequest.getAccountId()),
+                accountService.getAccountById(paymentRequest.getAccountId()),
                 PaymentType.valueOf(paymentRequest.getPaymentType().toUpperCase()),
                 paymentRequest.getCreditCard(),
                 paymentRequest.getAmount(),
